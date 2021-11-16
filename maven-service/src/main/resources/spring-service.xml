@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<!--    扫描包-->
+    <context:component-scan base-package="com.zuanshi.service"/>
+<!--    引入mybatis-spring.xml-->
+    <import resource="classpath:mybatis-spring.xml"/>
+<!--    注册事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+<!--    配置事务规则-->
+    <tx:advice id="myAdvice" transaction-manager="transactionManager">
+<!--        配置事务的属性-->
+        <tx:attributes>
+            <tx:method name="add*" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="insert*" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="update*" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="delete*" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="save*" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="edit*" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+<!--    配置事务的切面-->
+    <aop:config>
+        <aop:pointcut id="pt1" expression="execution(* com.zuanshi.service..*.*(..))"/>
+        <aop:advisor advice-ref="myAdvice" pointcut-ref="pt1"/>
+    </aop:config>
+<!--    配置事务的注解驱动-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
